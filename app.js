@@ -119,10 +119,10 @@ app.get('/waterUsage/currentMonth/:arduinoId', (req, res) => {
     });
 });
 
-app.post('/addWaterUsageEntry', (req, res) => {
-    const { waterUsage, arduinoId } = req.body; // Assuming you're sending waterUsage and arduinoId in the request body
+app.get('/addWaterUsageEntry/:waterUsage/:arduinoId', (req, res) => {
+    const { waterUsage, arduinoId } = req.params; // Extracting parameters from URL
 
-    // Validation - Ensure waterUsage and arduinoId are present
+    // Validation - Ensure waterUsage and arduinoId are present in URL parameters
     if (!waterUsage || !arduinoId) {
         return res.status(400).json({ message: 'Water usage and Arduino ID are required.' });
     }
