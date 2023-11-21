@@ -119,6 +119,29 @@ app.get('/waterUsage/currentMonth/:arduinoId', (req, res) => {
     });
 });
 
+app.post('/addWaterUsageEntry', (req, res) => {
+    const { waterUsage, arduinoId } = req.body; // Assuming you're sending waterUsage and arduinoId in the request body
+
+    // Validation - Ensure waterUsage and arduinoId are present
+    if (!waterUsage || !arduinoId) {
+        return res.status(400).json({ message: 'Water usage and Arduino ID are required.' });
+    }
+
+    // Convert waterUsage to a decimal number (assuming the input is in string format)
+    const waterUsageValue = parseFloat(waterUsage);
+
+    // Inserting into the WaterUsage table
+    const query = 'INSERT INTO WaterUsage (arduinoId, date_time, waterUsage) VALUES (?, NOW(), ?)';
+    connection.query(query, [arduinoId, waterUsageValue], (error, results) => {
+        if (error) {
+            console.error('Error adding entry to WaterUsage table:', error);
+            return res.status(500).json({ message: 'Internal server error' });
+        }
+
+        return res.status(200).json({ message: 'Entry added to WaterUsage table successfully' });
+    });
+});
+
 
 const PORT = process.env.PORT || 3306;
 
@@ -126,41 +149,3 @@ const PORT = process.env.PORT || 3306;
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
 });
-
-
-// // Define a simple route
-// app.get('/', (req, res) => {
-//     // Example query to fetch data
-//     connection.query('SELECT * FROM your_table', (err, results) => {
-//         if (err) {
-//             console.error('Error executing query:', err);
-//             res.status(500).send('Error fetching data');
-//             return;
-//         }
-//         res.json(results); // Assuming a JSON response
-//     });
-// });
-
-
-// // To get user details with a specific id
-// app.get('/users/:userId', (req, res) => {
-//     const userId = req.params.userId;
-
-//     const query = 'SELECT id, pass, arduinoId FROM Users WHERE id = ?';
-
-//     connection.query(query, [userId], (err, results) => {
-//         if (err) {
-//             console.error('Error fetching user details:', err);
-//             res.status(500).send('Error fetching user details');
-//             return;
-//         }
-
-//         if (results.length === 0) {
-//             res.status(404).send('User not found');
-//             return;
-//         }
-
-//         const user = results[0]; // Assuming there's only one user with this ID
-//         res.json(user);
-//     });
-// });
